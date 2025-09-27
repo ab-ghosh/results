@@ -22,3 +22,19 @@ resources:
   - ../../base
 components:
   - ../../components/metadata
+patches:
+  # Scale down watcher and retention-policy deployments to 0 replicas
+  - patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 0
+    target:
+      kind: Deployment
+      name: tekton-results-watcher
+  - patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 0
+    target:
+      kind: Deployment
+      name: tekton-results-retention-policy-agent

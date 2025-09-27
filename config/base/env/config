@@ -1,9 +1,9 @@
 DB_USER=
 DB_PASSWORD=
-DB_HOST=tekton-results-postgres-service.tekton-pipelines.svc.cluster.local
+DB_HOST=tekton-results-db.c3luemyzffve.us-east-1.rds.amazonaws.com
 DB_PORT=5432
-DB_NAME=tekton-results
-DB_SSLMODE=disable
+DB_NAME=postgres
+DB_SSLMODE=prefer
 DB_SSLROOTCERT=
 DB_ENABLE_AUTO_MIGRATION=true
 DB_MAX_IDLE_CONNECTIONS=10
