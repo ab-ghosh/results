@@ -1,0 +1,57 @@
+# ClusterLogForwarder for SPOKE cluster - forwards logs to HUB LokiStack
+# 
+# Before applying, replace:
+#   - ${HUB_LOKI_HOST} with your hub's Loki gateway URL
+#   - Create the hub-loki-token secret with the bearer token
+#
+# Example:
+#   export HUB_LOKI_HOST="https://logging-loki-gateway-openshift-logging.apps.hub.example.com"
+#   envsubst < spoke-clusterlogforwarder.yaml | oc apply -f -
+#
+apiVersion: observability.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: collector
+  namespace: openshift-logging
+spec:
+  inputs:
+  - application:
+      selector:
+        matchExpressions:
+        - key: app.kubernetes.io/managed-by
+          operator: In
+          values: ["tekton-pipelines", "pipelinesascode.tekton.dev"]
+    name: only-tekton
+    type: application
+  managementState: Managed
+  outputs:
+  - name: hub-lokistack
+    type: lokiStack
+    # URL of the hub cluster's Loki gateway
+    url: "${HUB_LOKI_HOST}"
+    lokiStack:
+      labelKeys:
+        application:
+          ignoreGlobal: true
+          labelKeys:
+          - log_type
+          - kubernetes.namespace_name
+          - openshift_cluster_id
+      authentication:
+        token:
+          # Secret containing the bearer token for hub Loki authentication
+          secret:
+            name: hub-loki-token
+            key: token
+    tls:
+      # Set to true for testing, false for production with proper CA
+      insecureSkipVerify: true
+  pipelines:
+  - inputRefs:
+    - only-tekton
+    name: forward-to-hub
+    outputRefs:
+    - hub-lokistack
+  serviceAccount:
+    name: collector
+
