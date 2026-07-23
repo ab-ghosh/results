@@ -24,7 +24,7 @@ import (
 var (
 	logLevel = map[string]gormlogger.LogLevel{
 		"silent": gormlogger.Silent,
-		"error":  gormlogger.Error,
+		"error":  gormlogger.Errors,
 		"warn":   gormlogger.Warn,
 		"info":   gormlogger.Info,
 	}
